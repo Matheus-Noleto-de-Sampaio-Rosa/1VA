@@ -124,106 +124,210 @@ return 0;
 #include <stdlib.h>
 #include <time.h>
 
-//A ideia é que tenha uma matriz base que mantenha registro da matriz do jogador 1 e 2 ao mesmo tempo
-//Ela terá valor 0 até que alguem escolha se escolherem o mesmo não tem problema ela irá aumentar de 1 em 1 a cada escolha
-//Ou seja se ambos escolherem essa celula terá valor 2 e se escolhido atingirá ambos
-//por algum motivo está executando o i = 2 e i = 3 duas vezes ou tres vezes por algum motivo
-
 int main(){
     srand(time(NULL));
-    int celulab[11][11], celula1[11][11], celula2[11][11], linha, coluna, verificador = 0, de = 0;
+    int celulab[10][10], celula1[10][10], celula2[10][10], linha = 0, coluna = 0, j = 0, vidaP1 = 7, vidaP2 = 7;
 
-    //inicializo a matriz base pra todos os valores serem 0 e assim poder armazenar a quantidade de embarcações em cada celula
-    for(int i = 0; i < 11; i++){
-        for(int j = 0; j < 11; j++){
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
             celulab[i][j] = 0;
             celula1[i][j] = 0;
             celula2[i][j] = 0;
-            }
         }
+    }
 
-    //posições do jogador 1
-    // o mais complexo aqui são as condições para poder colocar a embarcação
+    //decidir se a segunda embarcação fica virado para direita ou esquerda
+    int direitaEsquerda = rand() % 2;
+
+    j = 0;
+    //algoritmo de preenchimento da matriz do jogador 1
     for(int i = 0; i < 4; i++){
-        if(i == 0){
-            linha = rand() % 11;
-            coluna = rand() % 11;
+        if(i == 0) {
+            linha = rand() % 10;
+            coluna = rand() % 10;
 
-            //o celulab recebe++ para facilitar quando for a vez do jogador2
-            //quando o jogador 2 aumentar o numero irá dizer quantas embarcacoes ocupam a celula
-            celulab[linha][coluna]++;
             celula1[linha][coluna] = 1;
-
-
+            celulab[linha][coluna]++;
         }else if(i == 1){
-            for(int j = 0; j < 2; j++){
-                if(j == 0){
-                    linha = rand() % 11;
-                    coluna = rand() % 11;
-                    if(celula1[linha][coluna] == 1){
-                        j--;
-                    }else{
-                        celula1[linha][coluna] = 1;
-                        celulab[linha][coluna]++;
-                    }
-                }else{
-                    de = rand() % 2;
+            while(j < 1) {
+                linha = rand() % 10;
+                coluna = rand() % 10;
 
-
-                    if(verificador == 0 && coluna > 0){
-                        celula1[linha][coluna - 1] = 1;
-                        celulab[linha][coluna - 1]++;
-                    }else if(verificador == 1 && coluna < 10){
-                        celula1[linha][coluna + 1] = 1;
-                        celulab[linha][coluna + 1]++;
-                    }else{
-                        j--;
-                        }
-                    }
+                if( (celulab[linha][coluna] < 1 && direitaEsquerda == 0) && (coluna < 9) ) {
+                    celulab[linha][coluna]++;
+                    celulab[linha][coluna + 1]++;
+                    celula1[linha][coluna] = 1;
+                    celula1[linha][coluna + 1] = 1;
+                    j++;
+                }else if( (celulab[linha][coluna] < 1 && direitaEsquerda == 1) && (coluna > 0) ) {
+                    celulab[linha][coluna]++;
+                    celulab[linha][coluna - 1]++;
+                    celula1[linha][coluna] = 1;
+                    celula1[linha][coluna - 1] = 1;
+                    j++;
                 }
+            }
         }else if(i == 2){
-            for(int j = 0; j < 2; j++){
-                linha = rand() % 11;
-                coluna = rand() % 11;
-
-
-                if( (celula1[linha][coluna] != 1 && celula1[linha + 1][coluna + 1] != 1) && (linha > 0 && coluna < 10)){
+            j = 0;
+            while(j < 1){
+                linha = rand()%10;
+                coluna = rand()%10;
+                if( (celulab[linha][coluna] < 1 && celulab[linha - 1][coluna + 1] < 1) && (linha > 0 && coluna < 9) ){
                     celulab[linha][coluna]++;
                     celulab[linha - 1][coluna + 1]++;
                     celula1[linha][coluna] = 1;
                     celula1[linha - 1][coluna + 1] = 1;
-                }else{
-                    j--;
+                    j++;
                 }
             }
         }else if(i == 3){
-            for(int j = 0; j < 2; j++){
-                linha = rand() % 11;
-                coluna = rand() % 11;
-
-                if( (celula1[linha][coluna] != 1 && celula1[linha + 1][coluna + 1] != 1) && (linha < 10 && coluna < 10)){
+            j = 0;
+            while(j < 1){
+                linha = rand()%10;
+                coluna = rand()%10;
+                if( (celulab[linha][coluna] < 1 && celulab[linha - 1][coluna - 1] < 1) && (linha > 0 && coluna > 0)){
                     celulab[linha][coluna]++;
-                    celulab[linha + 1][coluna + 1]++;
+                    celulab[linha - 1][coluna - 1]++;
                     celula1[linha][coluna] = 1;
-                    celula1[linha + 1][coluna + 1] = 1;
-                }else{
-                    j--;
+                    celula1[linha - 1][coluna - 1] = 1;
+                    j++;
                 }
             }
         }
     }
 
-    for(int i = 0; i < 11; i++){
-        for(int j = 0; j < 11; j++){
+    // parte do jogador 2
+
+    direitaEsquerda = rand() % 2;
+    j = 0;
+
+    for(int i = 0; i < 4; i++){
+        if(i == 0) {
+            linha = rand() % 10;
+            coluna = rand() % 10;
+
+            celula2[linha][coluna] = 1;
+            celulab[linha][coluna]++;
+        }else if(i == 1){
+            while(j < 1) {
+                linha = rand() % 10;
+                coluna = rand() % 10;
+
+                if((celulab[linha][coluna] < 2 && direitaEsquerda == 0 ) && (coluna < 9)){
+                    celulab[linha][coluna]++;
+                    celulab[linha][coluna + 1]++;
+                    celula2[linha][coluna] = 1;
+                    celula2[linha][coluna + 1] = 1;
+                    j++;
+                }else if((celulab[linha][coluna] < 2 && direitaEsquerda == 1) && (coluna > 0)){
+                    celulab[linha][coluna]++;
+                    celulab[linha][coluna - 1]++;
+                    celula2[linha][coluna] = 1;
+                    celula2[linha][coluna - 1] = 1;
+                    j++;
+                }
+            }
+        }else if(i == 2){
+            j = 0;
+            while(j < 1){
+                linha = rand()%10;
+                coluna = rand()%10;
+                if((celulab[linha][coluna] < 2 && celulab[linha - 1][coluna + 1] < 2) && (linha > 0 && coluna < 9)){
+                    celulab[linha][coluna]++;
+                    celulab[linha - 1][coluna + 1]++;
+                    celula2[linha][coluna] = 1;
+                    celula2[linha - 1][coluna + 1] = 1;
+                    j++;
+                }
+            }
+        }else if(i == 3){
+            j = 0;
+            while(j < 1){
+                linha = rand()%10;
+                coluna = rand()%10;
+                if((celulab[linha][coluna] < 2 && celulab[linha - 1][coluna - 1] < 2) && (linha > 0 && coluna > 0)){
+                    celulab[linha][coluna]++;
+                    celulab[linha - 1][coluna - 1]++;
+                    celula2[linha][coluna] = 1;
+                    celula2[linha - 1][coluna - 1] = 1;
+                    j++;
+                }
+            }
+        }
+    }
+    //mapa do jogador 1
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
             printf("%i ", celula1[i][j]);
         }
         printf("\n");
     }
+
+    printf("\n\n");
+    //mapa do jogador 2
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            printf("%i ", celula2[i][j]);
+        }
+        printf("\n");
+    }
+
+    while(vidaP1 != 0 && vidaP2 != 0){
+        printf("Jogador 1 digite a linha e coluna para atacar\n\n");
+        scanf("%i %i", &linha, &coluna);
+        if(celula2[linha][coluna] == 1){
+            if(celula1[linha][coluna] == 1){
+                printf("Embarcacao inimiga destruida!\n\n");
+                printf("Erro. Propria navegação destruida!\n\n");
+                celula1[linha][coluna] = celula2[linha][coluna] = celulab[linha][coluna] = 0;
+                vidaP1--;
+                vidaP2--;
+                    if(vidaP1 == 0 || vidaP2 == 0){
+                        break;
+                    }
+            }else{
+                printf("Embarcação inimiga destruida!\n\n");
+                celula2[linha][coluna] = 0;
+                celulab[linha][coluna]--;
+                vidaP2--;
+                if(vidaP2 == 0){
+                    break;
+                }
+            }
+        }else{
+            printf("Não houve destruicao\n\n");
+        }
+        printf("Jogadro 2 digite a linha e coluna para atacar\n\n");
+        scanf("%i %i", &linha, &coluna);
+        if(celula1[linha][coluna] == 1){
+            if(celula2[linha][coluna] == 1){
+                printf("Embarcacao inimiga destruída!\n\n");
+                printf("Erro. Propria navegação destruída!\n\n");
+                celula1[linha][coluna] = celula2[linha][coluna] = celulab[linha][coluna] = 0;
+                vidaP1--;
+                vidaP2--;
+                if(vidaP1 == 0 || vidaP2 == 0){
+                    break;
+                }
+            }else{
+                printf("Embarcação inimiga destruída!\n\n");
+                celula1[linha][coluna] = 0;
+                celulab[linha][coluna]--;
+                vidaP1--;
+                if(vidaP1 == 0){
+                    break;
+                }
+            }
+        }else{
+            printf("Não houve destruição\n\n");
+        }
+    }
+
+    if(vidaP1 == 0){
+        printf("\nO vencedor eh o jogador 2");
+    }else{
+        printf("\nO vencedor eh o jogador 1");
+    }
+return 0;
 }
-
-
-//basta dar ctrl c ctrl v no codigo acima para o jogador 2 e mudando a variavel celula1 por celula2
-//apos isso crie uma parte do codigo para guardar os pontos do jogador 1 e do jogador 2  e um codigo onde de uma loopada para
-//ler as posições explodidas e levando em consideração os pontos
-
 ```
